@@ -90,7 +90,6 @@ async function searchTMDB() {
   const query = document.getElementById('search-input').value.trim();
   const container = document.getElementById('search-results');
 
-  // Hide results if query is empty
   if (!query) {
     container.innerHTML = '';
     container.classList.remove('show');
@@ -98,7 +97,7 @@ async function searchTMDB() {
   }
 
   try {
-    const res = await fetch(`${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
 
     if (!res.ok) {
       container.innerHTML = `<div style="color:#aaa;padding:18px;">Error: ${res.status} ${res.statusText}</div>`;
@@ -108,27 +107,36 @@ async function searchTMDB() {
 
     const data = await res.json();
 
-    if (!data.results || data.results.length === 0) {
+    // Filter out people, keep only movies and TV shows
+    const filteredResults = data.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+
+    if (filteredResults.length === 0) {
       container.innerHTML = '<div style="color:#aaa;padding:18px;">No results found.</div>';
       container.classList.add('show');
       return;
     }
 
-    // Clear previous results
     container.innerHTML = '';
 
-    data.results.forEach(item => {
+    filteredResults.forEach(item => {
       const imgSrc = item.poster_path
         ? `${IMG_URL}${item.poster_path}`
         : 'https://dummyimage.com/56x56/444/fff&text=?';
 
-      const title = item.name || item.title || 'Untitled';
-      const episodes = item.episode_count ? `${item.episode_count} Episodes` : '';
-      const status = item.status || '';
-      const year = item.first_air_date ? new Date(item.first_air_date).getFullYear() : '';
+      const title = item.title || item.name || 'Untitled';
 
-      const sub = `TV${episodes ? ' - ' + episodes : ''}${status ? ' (' + status + ')' : ''}`;
-      const meta = year ? `Year: ${year}` : '';
+      // Compose subtitle and meta info depending on media type
+      let sub = '';
+      let meta = '';
+      if (item.media_type === 'movie') {
+        sub = 'Movie';
+        meta = item.release_date ? `Year: ${new Date(item.release_date).getFullYear()}` : '';
+      } else if (item.media_type === 'tv') {
+        const episodes = item.number_of_episodes ? `${item.number_of_episodes} Episodes` : '';
+        const status = item.status || '';
+        sub = `TV${episodes ? ' - ' + episodes : ''}${status ? ' (' + status + ')' : ''}`;
+        meta = item.first_air_date ? `Year: ${new Date(item.first_air_date).getFullYear()}` : '';
+      }
 
       const div = document.createElement('div');
       div.className = 'search-list-item';
@@ -141,16 +149,16 @@ async function searchTMDB() {
         </div>
       `;
 
+      // Set media_type for showDetails to work correctly
       div.onclick = () => {
         showDetails(item);
-        container.classList.remove('show');  // Hide results on click
-        document.getElementById('search-input').value = '';  // Optional: clear input
+        container.classList.remove('show');
+        document.getElementById('search-input').value = '';
       };
 
       container.appendChild(div);
     });
 
-    // Show the results container
     container.classList.add('show');
 
   } catch (error) {
