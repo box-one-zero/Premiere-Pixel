@@ -9,15 +9,29 @@
   <link rel="preload" href="js/home.js" as="script">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script defer src="js/home.js"></script>
+  <script defer src="js/home.js" defer></script>
 </head>
 
 <body>
+<!-- Navbar -->
 <div class="navbar">
   <div class="navbar-left">
     <img src="./img/logo.svg" alt="LOGO HERE" />
-    <input type="text" class="search-bar" placeholder="Search..." onfocus="openSearchModal()" />
+    
+    <!-- Search area: input + results -->
+    <div class="search-area" id="search-area">
+      <input 
+        type="text" 
+        id="search-input" 
+        class="search-bar" 
+        placeholder="Search for a movie or show..." 
+        oninput="searchTMDB()" 
+        autocomplete="off" 
+      />
+      <div class="search-list" id="search-results"></div>
+    </div>
   </div>
+
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="index.html">Movies</a>
@@ -25,6 +39,7 @@
     <a href="index.html">Anime</a>
   </div>
 </div>
+
 
   <div class="banner" id="banner">
     <h1 id="banner-title"></h1>
@@ -67,12 +82,6 @@
       </div>
       <iframe id="modal-video" width="100%" height="315" frameborder="0" allowfullscreen></iframe>
     </div>
-  </div>
-
-  <div class="search-modal" id="search-modal">
-    <span class="close" onclick="closeSearchModal()" style="color: red;">&times;</span>
-    <input type="text" id="search-input" placeholder="Search for a movie or show..." oninput="searchTMDB()" />
-    <div class="results" id="search-results"></div>
   </div>
 
 <footer class="footer">
