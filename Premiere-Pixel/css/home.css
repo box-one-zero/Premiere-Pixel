@@ -1,25 +1,164 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #111; color: #fff; }
 
+/* Navbar styles */
 	.navbar {
 	  display: flex;
 	  justify-content: space-between;
 	  align-items: center;
-	  padding: 2px;
+	  padding: 10px 50px;
 	  background: #222;
+	  position: relative;
 	}
 
 	.navbar-left {
 	  display: flex;
 	  align-items: center;
-	  gap: 20px; /* Space between logo and search bar */
+	  gap: 20px;
+	  position: relative; /* For absolute positioning inside */
 	}
 
 	.navbar img {
-	  height: 100px;
-	  margin-left: 50px;
-	  
+	  height: 60px;
 	}
+
+/* Search area container */
+.search-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 300px; /* Adjust width as needed */
+  max-width: 100%; /* Responsive */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Search input */
+.search-bar {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 25px;
+  border: 1.5px solid transparent;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: #222;
+  color: #eee;
+}
+
+.search-bar::placeholder {
+  color: #aaa;
+}
+
+.search-bar:focus {
+  border-color: #ff3c00; /* Accent color */
+  box-shadow: 0 0 8px rgba(255, 60, 0, 0.6);
+  background-color: #2a2a2a;
+}
+
+/* Search results container */
+.search-list {
+  position: absolute;
+  top: 50px; /* Slightly below the input */
+  left: 0;
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #191919;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+  z-index: 1000;
+  display: none; /* Hidden by default */
+  padding: 8px 0;
+}
+
+/* Show results container when it has content */
+.search-list.show {
+  display: block;
+}
+
+/* Scrollbar styling for WebKit browsers */
+.search-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.search-list::-webkit-scrollbar-track {
+  background: #111;
+  border-radius: 8px;
+}
+
+.search-list::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 8px;
+  border: 2px solid #111;
+}
+
+/* Each search result item */
+.search-list-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.15s ease;
+}
+
+.search-list-item:last-child {
+  border-bottom: none;
+}
+
+.search-list-item:hover {
+  background-color: #2f2f2f;
+  transform: scale(1.02);
+}
+
+/* Image in results */
+.search-list-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+  background: #444;
+  flex-shrink: 0;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.search-list-item:hover .search-list-img {
+  box-shadow: 0 0 10px rgba(255, 60, 0, 0.8);
+}
+
+/* Text container */
+.search-list-details {
+  flex: 1;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Title */
+.search-list-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Subtitle and meta */
+.search-list-sub,
+.search-list-meta {
+  font-size: 0.85rem;
+  color: #bbb;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
 	.nav-links {
 	  display: flex;
@@ -34,12 +173,6 @@
 	  margin: 0 5px;
 	}
 
-	.search-bar {
-	  padding: 15px;
-	  border-radius: 50px;
-	  border: none;
-	  width: 400px;
-	}
 
     .banner {
       height: 50vh;
@@ -137,47 +270,6 @@
     .server-selector {
       margin: 15px 0;
       text-align: left;
-    }
-
-
-    .search-modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 15;
-    }
-
-    .search-modal input {
-      width: 300px;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      margin-bottom: 20px;
-    }
-
-    .search-modal .results {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .search-modal img {
-      width: 120px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .search-modal .close {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 30px;
     }
 
 /* MOBILE DISPLAY START */
