@@ -1,4 +1,4 @@
-const API_KEY = '6a2e7716c72cbadc002f540f618ee53e';
+const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
     const BASE_URL = 'https://api.themoviedb.org/3';
     const IMG_URL = 'https://image.tmdb.org/t/p/original';
     let currentItem;
@@ -83,31 +83,101 @@ const API_KEY = '6a2e7716c72cbadc002f540f618ee53e';
       document.getElementById('search-modal').style.display = 'none';
       document.getElementById('search-results').innerHTML = '';
     }
+	
+	
+	//query movie
+async function searchTMDB() {
+  const query = document.getElementById('search-input').value.trim();
+  const container = document.getElementById('search-results');
 
-    async function searchTMDB() {
-      const query = document.getElementById('search-input').value;
-      if (!query.trim()) {
-        document.getElementById('search-results').innerHTML = '';
-        return;
-      }
+  // Hide results if query is empty
+  if (!query) {
+    container.innerHTML = '';
+    container.classList.remove('show');
+    return;
+  }
 
-      const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${query}`);
-      const data = await res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
 
-      const container = document.getElementById('search-results');
-      container.innerHTML = '';
-      data.results.forEach(item => {
-        if (!item.poster_path) return;
-        const img = document.createElement('img');
-        img.src = `${IMG_URL}${item.poster_path}`;
-        img.alt = item.title || item.name;
-        img.onclick = () => {
-          closeSearchModal();
-          showDetails(item);
-        };
-        container.appendChild(img);
-      });
+    if (!res.ok) {
+      container.innerHTML = `<div style="color:#aaa;padding:18px;">Error: ${res.status} ${res.statusText}</div>`;
+      container.classList.add('show');
+      return;
     }
+
+    const data = await res.json();
+
+    if (!data.results || data.results.length === 0) {
+      container.innerHTML = '<div style="color:#aaa;padding:18px;">No results found.</div>';
+      container.classList.add('show');
+      return;
+    }
+
+    // Clear previous results
+    container.innerHTML = '';
+
+    data.results.forEach(item => {
+      const imgSrc = item.poster_path
+        ? `${IMG_URL}${item.poster_path}`
+        : 'https://dummyimage.com/56x56/444/fff&text=?';
+
+      const title = item.name || item.title || 'Untitled';
+      const episodes = item.episode_count ? `${item.episode_count} Episodes` : '';
+      const status = item.status || '';
+      const year = item.first_air_date ? new Date(item.first_air_date).getFullYear() : '';
+
+      const sub = `TV${episodes ? ' - ' + episodes : ''}${status ? ' (' + status + ')' : ''}`;
+      const meta = year ? `Year: ${year}` : '';
+
+      const div = document.createElement('div');
+      div.className = 'search-list-item';
+      div.innerHTML = `
+        <img class="search-list-img" src="${imgSrc}" alt="${title}">
+        <div class="search-list-details">
+          <div class="search-list-title">${title}</div>
+          <div class="search-list-sub">${sub}</div>
+          <div class="search-list-meta">${meta}</div>
+        </div>
+      `;
+
+      div.onclick = () => {
+        showDetails(item);
+        container.classList.remove('show');  // Hide results on click
+        document.getElementById('search-input').value = '';  // Optional: clear input
+      };
+
+      container.appendChild(div);
+    });
+
+    // Show the results container
+    container.classList.add('show');
+
+  } catch (error) {
+    console.error('Search error:', error);
+    container.innerHTML = '<div style="color:#aaa;padding:18px;">Network error. Please try again.</div>';
+    container.classList.add('show');
+  }
+}
+
+// Close results when clicking outside search area
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', function(event) {
+    const searchArea = document.getElementById('search-area');
+    const resultsContainer = document.getElementById('search-results');
+
+    if (!searchArea.contains(event.target)) {
+      resultsContainer.classList.remove('show');
+    }
+  });
+});
+
+// Optional: Close results on Escape key press
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    document.getElementById('search-results').classList.remove('show');
+  }
+});
 
     async function init() {
       const movies = await fetchTrending('movie');
